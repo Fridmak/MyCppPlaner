@@ -1,4 +1,4 @@
-#include "../include/windwos/main_window.h"
+#include "../include/windows/main_window.h"
 #include <QVBoxLayout>
 #include <QCalendarWidget>
 

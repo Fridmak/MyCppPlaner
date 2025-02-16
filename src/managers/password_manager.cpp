@@ -3,6 +3,7 @@
 #include <QSettings>
 #include <QString>
 #include <QByteArray>
+#include <QRandomGenerator>
 
 //Setting const values
 
@@ -23,7 +24,12 @@ const QString PasswordManager::KEY_REMEMBER_ME = "rememberMe";
 // Private help methods
 
 QString PasswordManager::generateSalt(int length) {
-    QByteArray salt = QRandomGenerator::global()->generateByteArray(length);
+    QByteArray salt(length, 0);
+    QRandomGenerator* generator = QRandomGenerator::global();
+    for (int i = 0; i < length; ++i) {
+        salt[i] = static_cast<char>(generator->generate() & 0xFF);
+    }
+
     return QString(salt.toHex());
 }
 
@@ -43,6 +49,11 @@ QString PasswordManager::encryptPassword(const QString& password) {
 PasswordManager& PasswordManager::instance() {
     static PasswordManager instance;
     return instance;
+}
+
+void PasswordManager::deleteAllData() {
+    QSettings settings(SETTINGS_ORG, SETTINGS_APP);
+    settings.clear();
 }
 
 void PasswordManager::saveUserInfo(const QString& username, const QString& password, bool rememberMe) {

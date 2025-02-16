@@ -16,6 +16,6 @@ void RegisterWindow::setupUI() {
 
     QWidget* centralWidget = new QWidget(this);
 
-    resize(800, 600);
+    resize(400, 600);
     setWindowTitle("My Planer Registration");
 }

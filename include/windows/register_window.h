@@ -14,6 +14,9 @@ public:
     RegisterWindow(QWidget *parent = nullptr);
     ~RegisterWindow();
 
+    void showNextWindow(WindowType type);
+    void goBack();
+
 private:
     QLineEdit* usernameLineEdit;
     QLineEdit* passwordLineEdit;

@@ -34,6 +34,7 @@ private:
 	PasswordManager() = default;
 	~PasswordManager() = default;
 
+	void deleteAllData();
 	QString generateSalt(int length);
 	QString hashPassword(const QString& password, const QString& salt);
 	QString encryptPassword(const QString& password);
