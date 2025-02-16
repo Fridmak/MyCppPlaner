@@ -1,0 +1,9 @@
+# ninja log v6
+65	246	7613992850090591	MyCppPlanner_autogen/timestamp	ee88030b958a83a3
+65	246	7613992850090591	MyCppPlanner_autogen/mocs_compilation.cpp	ee88030b958a83a3
+65	246	7613992850090591	C:/Users/apbat/source/repos/MyCppPlanner/out/build/x64-debug/MyCppPlanner_autogen/timestamp	ee88030b958a83a3
+65	246	7613992850090591	C:/Users/apbat/source/repos/MyCppPlanner/out/build/x64-debug/MyCppPlanner_autogen/mocs_compilation.cpp	ee88030b958a83a3
+248	3872	7613992851928826	CMakeFiles/MyCppPlanner.dir/src/main.cpp.obj	705427240754aa61
+2584	7054	7613991230249961	CMakeFiles/MyCppPlanner.dir/MyCppPlanner_autogen/mocs_compilation.cpp.obj	a16c144cb3e53d6e
+2601	7068	7613991230412348	CMakeFiles/MyCppPlanner.dir/src/mainwindow.cpp.obj	83b23ee2a2462446
+3872	4163	7613992888160721	MyCppPlanner.exe	3646ff753f59193e
