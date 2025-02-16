@@ -18,11 +18,10 @@ set(CMAKE_AUTOUIC ON)
 
 add_executable (MyCppPlanner 
     "src/main.cpp" 
-     
-     
-    "include/main_window.h" 
-    "src/main_window.cpp"
- "include/register_window.h")
+    "include/windows/main_window.h" 
+    "src/windows/main_window.cpp"
+    "include/windows/register_window.h"
+    "src/windows/register_window.cpp"   "src/windows/managers/password_manager.cpp")
 
 # Добавляем линковку с Qt
 target_link_libraries(MyCppPlanner PRIVATE

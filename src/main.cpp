@@ -1,9 +1,10 @@
-﻿#include "../include//mainwindow.h"
+﻿#include "../include/windows/main_window.h"
+#include "../include/windows/register_window.h"
 #include <QApplication>
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    MainWindow window;
+    RegisterWindow window;
     window.show();
     
     return app.exec();

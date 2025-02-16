@@ -1,19 +1,16 @@
-#include "../include/mainwindow.h"
+#include "../include/windwos/main_window.h"
 #include <QVBoxLayout>
 #include <QCalendarWidget>
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
-{
+    : QMainWindow(parent){
     setupUI();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
 }
 
-void MainWindow::setupUI()
-{
+void MainWindow::setupUI(){
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
 
