@@ -5,21 +5,13 @@
 #include <QByteArray>
 #include <QRandomGenerator>
 
-//Setting const values
-
 const QString PasswordManager::HASH_SEPARATOR = ":";
-
 const QString PasswordManager::SETTINGS_ORG = "LoginData";
-
 const QString PasswordManager::SETTINGS_APP = "MyCppPlanner";
-
 const QString PasswordManager::KEY_USERNAME = "username";
-
 const QString PasswordManager::KEY_PASSWORD = "password";
+const QString PasswordManager::KEY_REMEMBER_ME = "remember_me";
 
-const QString PasswordManager::KEY_REMEMBER_ME = "rememberMe";
-
-// Done
 
 // Private help methods
 

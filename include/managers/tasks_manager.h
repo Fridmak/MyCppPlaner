@@ -33,7 +33,8 @@ public:
     
     QList<Task> getAllTasks() const;
     QList<Task> getTasksByStatus(Task::Status status) const;
-    QList<Task> getTasksByDeadline(const QDate& date) const;
+    QList<Task> getTasksBeforeDeadline(const QDate& date) const;
+    QList<Task> getTasksAfterDeadline(const QDate& date) const;
     
     QStringList getCategories() const;
     void addCategory(const QString& category);
@@ -48,6 +49,8 @@ private:
     TasksManager() = default;
     ~TasksManager() = default;
     
+    QList<Task> getTasksByDeadline(const QDate& date, std::function<bool(const QDate&, const QDate&)> cond) const;
+
     void deleteAllData();
     QString generateTaskId() const;
     void saveTasks() const;
