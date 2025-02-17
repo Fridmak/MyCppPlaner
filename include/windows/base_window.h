@@ -14,15 +14,21 @@ class BaseWindow : public QWidget {
     Q_OBJECT
 
 public:
-    virtual void initialize() = 0;
-    virtual void cleanup() = 0;
+    explicit BaseWindow(WindowType type, QWidget* parent = nullptr)
+        : QWidget(parent), type(type) {
+    }
 
-    BaseWindow(QWidget* parent = nullptr) : QWidget(parent) {}
     virtual ~BaseWindow() = default;
+    WindowType type;
+    virtual void show() = 0;
+
+
 
 protected:
-    void showNextWindow(WindowType type);
-    void goBack();
-private:
-    void setupUI();
+    virtual void setupUI() = 0;
+    virtual void cleanup() {}
+
+    virtual void showNextWindow(WindowType type) { Q_UNUSED(type); }
+    virtual void goBack() {}
+    virtual void goHome() {}
 };

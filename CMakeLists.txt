@@ -16,7 +16,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 add_executable (MyCppPlanner 
-    "src/main.cpp"
+    "main.cpp"
 
     "include/managers/app_state_manager.h"
     "include/managers/notification_manager.h"
@@ -37,7 +37,7 @@ add_executable (MyCppPlanner
 
     
     
- "include/windows/register_window.h" "src/windows/register_window.cpp")
+ "include/windows/register_window.h" "src/windows/register_window.cpp" "src/windows/main_window.cpp" "src/windows/settings_window.cpp")
 
 #Qt lib
 target_link_libraries(MyCppPlanner PRIVATE
