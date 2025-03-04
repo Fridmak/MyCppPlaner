@@ -7,30 +7,44 @@ endif()
 
 project ("MyCppPlanner")
 
-set(CMAKE_PREFIX_PATH "C:/Program Files/6.5.2/msvc2019_64")
+set(CMAKE_PREFIX_PATH "C:\\Cpp\\6.8.2\\mingw_64")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
-
-# Добавляем поддержку UI файлов
+ 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 add_executable (MyCppPlanner 
-    "src/main.cpp" 
-     
-     
-    "include/main_window.h" 
-    "src/main_window.cpp"
- "include/register_window.h")
+    "main.cpp"
 
-# Добавляем линковку с Qt
+    "include/managers/app_state_manager.h"
+    "include/managers/notification_manager.h"
+    "include/managers/password_manager.h"
+    "include/managers/settings_manager.h"
+    "include/managers/tasks_manager.h"
+    "include/managers/window_manager.h"
+
+    
+    
+
+    "src/managers/app_state_manager.cpp"
+    "src/managers/notification_manager.cpp"
+    "src/managers/password_manager.cpp"
+    "src/managers/settings_manager.cpp"
+    "src/managers/tasks_manager.cpp"
+    "src/managers/window_manager.cpp"
+
+    
+    
+ "include/windows/register_window.h" "src/windows/register_window.cpp" "src/windows/main_window.cpp" "src/windows/settings_window.cpp")
+
+#Qt lib
 target_link_libraries(MyCppPlanner PRIVATE
     Qt6::Core
     Qt6::Widgets
 )
 
-# Добавляем пути к заголовочным файлам
 target_include_directories(MyCppPlanner PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
