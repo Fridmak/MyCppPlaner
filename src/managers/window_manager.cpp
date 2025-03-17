@@ -19,7 +19,7 @@ WindowManager::~WindowManager() {
     }
 }
 
-void WindowManager::showWindow(WindowType type, const WindowParamsMap& params) {
+void WindowManager::showNewWindow(WindowType type, const WindowParamsMap& params) {
     auto newWindow = createWindow(type, params);
     if (!newWindow) return;
 
@@ -27,6 +27,14 @@ void WindowManager::showWindow(WindowType type, const WindowParamsMap& params) {
     windows.push(std::move(newWindow));
     navigationHistory.push(type);
     saveLastWindow(type);
+}
+
+void WindowManager::showWindow() {
+	if (!windows.isEmpty()) {
+        if (windows.top()->isHidden()){
+            windows.top()->show();
+        }
+	}
 }
 
 void WindowManager::hideCurrentWindow() {
@@ -53,7 +61,7 @@ void WindowManager::closeAllAndShow(WindowType type, const WindowParamsMap& para
     }
     navigationHistory.clear();
 
-    showWindow(type, params);
+    showNewWindow(type, params);
 }
 
 BaseWindow* WindowManager::getCurrentWindow() const {
@@ -83,7 +91,7 @@ std::unique_ptr<BaseWindow> WindowManager::createWindow(WindowType type, const W
     }
 
     if (window) {
-        window->initialize();
+        window->initialize(params);
     }
 
     return window;

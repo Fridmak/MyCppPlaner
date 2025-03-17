@@ -1,23 +1,25 @@
 #pragma once
-#include "base_window.h"
+
+#include "../../include/windows/base_window.h"
+#include <unordered_map>
+#include <variant>
 #include <QLineEdit>
+#include <QPushButton>
 
 class RegisterWindow : public BaseWindow {
     Q_OBJECT
 
 public:
-    RegisterWindow(QWidget* parent = nullptr);
-    void initialize() override;
+    explicit RegisterWindow(WindowType type, QWidget* parent = nullptr);
+    void initialize(const std::unordered_map<std::string, std::variant<int, QString, bool>>& params) override;
 
-private:
-    void setupUI();
-    void createConnections();
-
-private slots:
-    void onRegisterClicked();
+protected:
+    void setupUI() override;
 
 private:
     QLineEdit* usernameInput;
     QLineEdit* passwordInput;
     QPushButton* registerButton;
+
+    void handleRegisterButtonClicked();
 };

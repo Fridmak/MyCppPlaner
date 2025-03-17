@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <string>
 
 enum class WindowType {
     Login,
@@ -19,15 +20,13 @@ public:
     }
 
     virtual ~BaseWindow() = default;
+
     WindowType type;
-    virtual void show() = 0;
-
-
+    virtual void initialize(const std::unordered_map<std::string, std::variant<int, QString, bool>>& params) = 0;
 
 protected:
     virtual void setupUI() = 0;
     virtual void cleanup() {}
-
     virtual void showNextWindow(WindowType type) { Q_UNUSED(type); }
     virtual void goBack() {}
     virtual void goHome() {}
