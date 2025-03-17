@@ -10,6 +10,11 @@ StateManager& StateManager::instance() {
     return instance;
 }
 
+StateManager::StateManager() : currentState(AppState::Unauthorized) {
+    loadState();
+    saveState();
+}
+
 void StateManager::setAppState(AppState state) {
     currentState = state;
     saveState();
@@ -21,7 +26,7 @@ StateManager::AppState StateManager::getCurrentState() const {
 
 void StateManager::setError(const QString& error) {
     lastError.append(error);
-    if (lastError.size() > 10) { // Only 10 errors saved
+    if (lastError.size() > MAX_ERRORS) {
         lastError.removeFirst();
     }
     setAppState(AppState::Error);
@@ -39,10 +44,6 @@ bool StateManager::isAuthorized() const {
     return currentState == AppState::Authorized;
 }
 
-void StateManager::setAuthorized(bool auth) {
-    setAppState(auth ? AppState::Authorized : AppState::Unauthorized);
-}
-
 void StateManager::saveState() {
     QSettings settings(SETTINGS_ORG, SETTINGS_APP);
     settings.setValue(KEY_APP_STATE, static_cast<int>(currentState));
@@ -52,4 +53,11 @@ void StateManager::loadState() {
     QSettings settings(SETTINGS_ORG, SETTINGS_APP);
     currentState = static_cast<AppState>(settings.value(KEY_APP_STATE, 
         static_cast<int>(AppState::Unauthorized)).toInt());
+}
+
+void StateManager::clearState() {
+    QSettings settings(SETTINGS_ORG, SETTINGS_APP);
+    settings.remove(KEY_APP_STATE);
+    currentState = AppState::Unauthorized;
+    lastError.clear();
 }

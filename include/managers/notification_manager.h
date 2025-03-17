@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QList>
 #include <QSettings>
+#include <QMutex>
 
 struct Notification {
     QString id;
@@ -23,7 +24,6 @@ public:
     
     QList<Notification> getPendingNotifications() const;
     QList<Notification> getNotificationsForTask(const QString& taskId) const;
-    bool numberOfUnreadNotifications() const;
     
     void clearOldNotifications(const QDateTime& before);
     void clearAllNotifications();
@@ -33,14 +33,17 @@ private:
     static const QString SETTINGS_APP;
     static const QString KEY_NOTIFICATIONS;
     static const QString KEY_LAST_CHECK;
+    bool needsSave;
+    mutable QMutex mutex;
 
     NotificationManager() = default;
     ~NotificationManager() = default;
 
     void deleteAllData();
     QString generateNotificationId() const;
-    void saveNotifications() const;
+    void saveNotifications(bool forceSave);
     void loadNotifications();
+	int getNumberOfUnreadNotifications() const;
 
     QList<Notification> notifications;
 
