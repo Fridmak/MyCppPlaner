@@ -4,6 +4,8 @@
 #include <QDateTime>
 #include <QList>
 #include <QSettings>
+#include <functional>
+#include <QStringList>
 
 class Task {
 public:
@@ -30,15 +32,23 @@ public:
     bool updateTask(const QString& taskId, const Task& task);
     bool deleteTask(const QString& taskId);
     Task getTask(const QString& taskId) const;
-    
+
     QList<Task> getAllTasks() const;
     QList<Task> getTasksByStatus(Task::Status status) const;
     QList<Task> getTasksBeforeDeadline(const QDate& date) const;
     QList<Task> getTasksAfterDeadline(const QDate& date) const;
-    
+    QList<Task> getTasksDueToday() const;
+    QList<Task> getTasksDueTomorrow() const;
+    QList<Task> getTasksDueThisWeek() const;
+    QList<Task> getTasksByCategory(const QString& category) const;
+    QList<Task> getTasksByPriority(Task::Priority priority) const;
+
     QStringList getCategories() const;
     void addCategory(const QString& category);
     void removeCategory(const QString& category);
+
+    void setTaskNotificationsEnabled(const QString& taskId, bool enable);
+    void resetToDefaults();
 
 private:
     static const QString SETTINGS_ORG;
@@ -48,7 +58,7 @@ private:
 
     TasksManager() = default;
     ~TasksManager() = default;
-    
+
     QList<Task> getTasksByDeadline(const QDate& date, std::function<bool(const QDate&, const QDate&)> cond) const;
 
     void deleteAllData();

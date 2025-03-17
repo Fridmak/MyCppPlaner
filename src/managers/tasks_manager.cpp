@@ -3,8 +3,8 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QDate>
 #include <algorithm>
-#include <iostream>
 
 const QString TasksManager::SETTINGS_ORG = "Tasks";
 const QString TasksManager::SETTINGS_APP = "MyCppPlanner";
@@ -17,19 +17,19 @@ TasksManager& TasksManager::instance() {
 }
 
 QString TasksManager::addTask(const Task& task) {
+    QString taskId = generateTaskId();
     Task newTask = task;
-    newTask.id = generateTaskId();
+    newTask.id = taskId;
     tasks.append(newTask);
     saveTasks();
-    return newTask.id;
+    return taskId;
 }
 
 bool TasksManager::updateTask(const QString& taskId, const Task& task) {
-    for (int i = 0; i < tasks.size(); ++i) {
-        if (tasks[i].id == taskId) {
-            Task updatedTask = task;
-            updatedTask.id = taskId;
-            tasks[i] = updatedTask;
+    for (auto& t : tasks) {
+        if (t.id == taskId) {
+            t = task;
+            t.id = taskId; // Ensure ID remains unchanged
             saveTasks();
             return true;
         }
@@ -38,12 +38,11 @@ bool TasksManager::updateTask(const QString& taskId, const Task& task) {
 }
 
 bool TasksManager::deleteTask(const QString& taskId) {
-    for (int i = 0; i < tasks.size(); ++i) {
-        if (tasks[i].id == taskId) {
-            tasks.removeAt(i);
-            saveTasks();
-            return true;
-        }
+    auto it = std::remove_if(tasks.begin(), tasks.end(), [&taskId](const Task& t) { return t.id == taskId; });
+    if (it != tasks.end()) {
+        tasks.erase(it, tasks.end());
+        saveTasks();
+        return true;
     }
     return false;
 }
@@ -62,33 +61,70 @@ QList<Task> TasksManager::getAllTasks() const {
 }
 
 QList<Task> TasksManager::getTasksByStatus(Task::Status status) const {
-    QList<Task> filteredTasks;
+    QList<Task> result;
     for (const auto& task : tasks) {
         if (task.status == status) {
-            filteredTasks.append(task);
+            result.append(task);
         }
     }
-    return filteredTasks;
-}
-
-QList<Task> TasksManager::getTasksByDeadline(const QDate& date, std::function<bool(const QDate&, const QDate&)> cond) const {
-    QList<Task> filteredTasks;
-    for (const auto& task : tasks) {
-        if (cond(task.deadline.date(), date)) {
-            filteredTasks.append(task);
-        }
-    }
-    return filteredTasks;
+    return result;
 }
 
 QList<Task> TasksManager::getTasksBeforeDeadline(const QDate& date) const {
-    auto lessThanOrEqualTo = [](const QDate& a, const QDate& b) { return a <= b; };
-    return getTasksByDeadline(date, lessThanOrEqualTo);
+    return getTasksByDeadline(date, [](const QDate& deadline, const QDate& compareDate) {
+        return deadline < compareDate;
+        });
 }
 
 QList<Task> TasksManager::getTasksAfterDeadline(const QDate& date) const {
-    auto biggerThanOrEqualTo = [](const QDate& a, const QDate& b) { return a >= b; };
-    return getTasksByDeadline(date, biggerThanOrEqualTo);
+    return getTasksByDeadline(date, [](const QDate& deadline, const QDate& compareDate) {
+        return deadline > compareDate;
+        });
+}
+
+QList<Task> TasksManager::getTasksDueToday() const {
+    return getTasksByDeadline(QDate::currentDate(), [](const QDate& deadline, const QDate& today) {
+        return deadline == today;
+        });
+}
+
+QList<Task> TasksManager::getTasksDueTomorrow() const {
+    QDate tomorrow = QDate::currentDate().addDays(1);
+    return getTasksByDeadline(tomorrow, [](const QDate& deadline, const QDate& compareDate) {
+        return deadline == compareDate;
+        });
+}
+
+QList<Task> TasksManager::getTasksDueThisWeek() const {
+    QDate startOfWeek = QDate::currentDate().addDays(-QDate::currentDate().dayOfWeek() + 1);
+    QDate endOfWeek = startOfWeek.addDays(6);
+    QList<Task> result;
+    for (const auto& task : tasks) {
+        if (task.deadline.date() >= startOfWeek && task.deadline.date() <= endOfWeek) {
+            result.append(task);
+        }
+    }
+    return result;
+}
+
+QList<Task> TasksManager::getTasksByCategory(const QString& category) const {
+    QList<Task> result;
+    for (const auto& task : tasks) {
+        if (task.category == category) {
+            result.append(task);
+        }
+    }
+    return result;
+}
+
+QList<Task> TasksManager::getTasksByPriority(Task::Priority priority) const {
+    QList<Task> result;
+    for (const auto& task : tasks) {
+        if (task.priority == priority) {
+            result.append(task);
+        }
+    }
+    return result;
 }
 
 QStringList TasksManager::getCategories() const {
@@ -98,24 +134,48 @@ QStringList TasksManager::getCategories() const {
 void TasksManager::addCategory(const QString& category) {
     if (!categories.contains(category)) {
         categories.append(category);
-        QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-        settings.setValue(KEY_CATEGORIES, categories);
+        saveTasks();
     }
 }
 
 void TasksManager::removeCategory(const QString& category) {
-    if (categories.removeOne(category)) {
-        QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-        settings.setValue(KEY_CATEGORIES, categories);
+    categories.removeAll(category);
+    for (auto& task : tasks) {
+        if (task.category == category) {
+            task.category.clear();
+        }
+    }
+    saveTasks();
+}
+
+void TasksManager::setTaskNotificationsEnabled(const QString& taskId, bool enable) {
+    for (auto& task : tasks) {
+        if (task.id == taskId) {
+            task.hasNotification = enable;
+            saveTasks();
+            break;
+        }
     }
 }
 
+void TasksManager::resetToDefaults() {
+    deleteAllData();
+}
+
+QList<Task> TasksManager::getTasksByDeadline(const QDate& date, std::function<bool(const QDate&, const QDate&)> cond) const {
+    QList<Task> result;
+    for (const auto& task : tasks) {
+        if (cond(task.deadline.date(), date)) {
+            result.append(task);
+        }
+    }
+    return result;
+}
+
 void TasksManager::deleteAllData() {
-    QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-    settings.remove(KEY_TASKS);
-    settings.remove(KEY_CATEGORIES);
     tasks.clear();
     categories.clear();
+    saveTasks();
 }
 
 QString TasksManager::generateTaskId() const {
@@ -124,8 +184,8 @@ QString TasksManager::generateTaskId() const {
 
 void TasksManager::saveTasks() const {
     QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-    QJsonArray tasksArray;
 
+    QJsonArray tasksArray;
     for (const auto& task : tasks) {
         QJsonObject taskObj;
         taskObj["id"] = task.id;
@@ -139,18 +199,20 @@ void TasksManager::saveTasks() const {
         taskObj["hasNotification"] = task.hasNotification;
         tasksArray.append(taskObj);
     }
-
     settings.setValue(KEY_TASKS, QJsonDocument(tasksArray).toJson(QJsonDocument::Compact));
+
+    settings.setValue(KEY_CATEGORIES, categories);
 }
 
 void TasksManager::loadTasks() {
     QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-    tasks.clear();
 
-    QByteArray data = settings.value(KEY_TASKS).toByteArray();
-    if (!data.isEmpty()) {
-        QJsonDocument doc = QJsonDocument::fromJson(data);
-        if (doc.isArray()) {
+    tasks.clear();
+    QByteArray tasksData = settings.value(KEY_TASKS).toByteArray();
+    if (!tasksData.isEmpty()) {
+        QJsonParseError parseError;
+        QJsonDocument doc = QJsonDocument::fromJson(tasksData, &parseError);
+        if (parseError.error == QJsonParseError::NoError && doc.isArray()) {
             QJsonArray tasksArray = doc.array();
             for (const auto& taskValue : tasksArray) {
                 QJsonObject taskObj = taskValue.toObject();
