@@ -7,25 +7,27 @@
 #include <QMessageBox>
 #include <iostream>
 
-RegisterWindow::RegisterWindow(WindowType type, QWidget* parent)
-    : BaseWindow(type, parent), usernameInput(nullptr), passwordInput(nullptr), registerButton(nullptr) {
+RegisterWindow::RegisterWindow(WindowParams params, QWidget* parent)
+    : BaseWindow(params, parent), usernameInput(nullptr), passwordInput(nullptr), registerButton(nullptr) {
     setupUI();
 }
 
-void RegisterWindow::initialize(const std::unordered_map<std::string, std::variant<int, QString, bool>>& params) {
-    auto titleIt = params.find("title");
-    if (titleIt != params.end() && std::holds_alternative<QString>(titleIt->second)) {
-        setWindowTitle(std::get<QString>(titleIt->second));
-    }
-    else {
+void RegisterWindow::initialize(const WindowParams& params) {
+    auto dbAnswer = getStoredInfoFromParamsByKey("title", params);
+
+    if (std::holds_alternative<Error>(dbAnswer) || !std::holds_alternative<QString>(dbAnswer)) {
+        Error error = std::get<Error>(dbAnswer);
         setWindowTitle("Register");
     }
+    else {
+        auto title = std::get<QString>(dbAnswer);
+        setWindowTitle(title);
+    }
 
-    auto fullscreenIt = params.find("fullscreen");
-    if (fullscreenIt != params.end() && std::holds_alternative<bool>(fullscreenIt->second)) {
-        if (std::get<bool>(fullscreenIt->second)) {
-            showFullScreen();
-        }
+    auto fullScreen = getStoredInfoFromParamsByKey("size", params);
+
+    if (!std::holds_alternative<Error>(fullScreen) && std::holds_alternative<bool>(fullScreen))){
+        showFullScreen();
     }
 }
 
@@ -63,7 +65,37 @@ void RegisterWindow::handleRegisterButtonClicked() {
     }
 
     PasswordManager& passwordManager = PasswordManager::instance();
+
+    if (passwordManager.hasStoredInfo(username)) {
+        QMessageBox::warning(this, "Error", "User already registered");
+        return;
+    }
+
 	passwordManager.saveUserInfo(username, password, false);
 
-    showNextWindow(WindowType::Main);
+    showNextWindow();
+}
+
+void RegisterWindow::signUpButtonClicked() {
+    QString username = usernameInput->text();
+    QString password = passwordInput->text();
+
+    if (username.isEmpty() || password.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Username and password cannot be empty.");
+        return;
+    }
+
+    PasswordManager& passwordManager = PasswordManager::instance();
+    bool correct = passwordManager.checkPassword(username, password);
+
+    if (!correct) {
+        QMessageBox::warning(this, "Error", "Username or password are incorrect");
+        return;
+    }
+
+    showNextWindow();
+}
+
+void RegisterWindow::showNextWindow(WindowParams params) {
+
 }

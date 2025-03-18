@@ -82,17 +82,12 @@ void PasswordManager::deleteUserInfo(const QString& username, const QString& pas
     settings.remove(KEY_REMEMBER_ME);
 }
 
-bool PasswordManager::hasStoredInfo() const {
+bool PasswordManager::hasStoredInfo(const QString& username) const {
     QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-    return settings.value(KEY_REMEMBER_ME, false).toBool();
+    return settings.value(username, false).toBool();
 }
 
-QString PasswordManager::getStoredUsername() const {
+bool PasswordManager::checkStoredPassword(const QString& userName, const QString& passwordTyped) const {
     QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-    return settings.value(KEY_USERNAME).toString();
-}
-
-QString PasswordManager::getStoredPassword() const {
-    QSettings settings(SETTINGS_ORG, SETTINGS_APP);
-    return settings.value(KEY_PASSWORD).toString();
+    return settings.value(KEY_PASSWORD).toString() == passwordTyped;
 }

@@ -12,10 +12,9 @@ public:
 	void saveUserInfo(const QString& username, const QString& password, bool rememberMe);
 	void deleteUserInfo(const QString& username, const QString& password);
 
-	bool hasStoredInfo() const;
+	bool hasStoredInfo(const QString& userName) const;
 
-	QString getStoredUsername() const; //Don't forget to check via hasStoredInfo()!!!
-	QString getStoredPassword() const;
+	bool checkStoredPassword(const QString& userName, const QString& passwordTyped) const;
 
 	bool checkPassword(const QString& inputPassword, const QString& storedPassword);
 

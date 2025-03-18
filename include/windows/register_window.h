@@ -10,8 +10,8 @@ class RegisterWindow : public BaseWindow {
     Q_OBJECT
 
 public:
-    explicit RegisterWindow(WindowType type, QWidget* parent = nullptr);
-    void initialize(const std::unordered_map<std::string, std::variant<int, QString, bool>>& params) override;
+    explicit RegisterWindow(WindowParams params, QWidget* parent = nullptr);
+    void initialize(const WindowParams& params) override;
 
 protected:
     void setupUI() override;
@@ -22,4 +22,5 @@ private:
     QPushButton* registerButton;
 
     void handleRegisterButtonClicked();
+    void signUpButtonClicked();
 };
